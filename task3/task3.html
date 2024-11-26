@@ -1,0 +1,124 @@
+<html lang="en">
+<head>
+    <title>Issue State Change</title>
+    <style>
+        .block {
+            width: 100%;
+            height: auto;
+        }
+        .raw {
+            margin: auto;
+            width: 50%;
+            padding: 15px;
+            font-size: 20px;
+        }
+        .raw h1 {
+            text-align: center;
+        }
+        .btn {
+            cursor: pointer;
+            border: 1px solid transparent;
+            padding: 12px 20px;
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+            border-radius: 4px;
+            text-align: center;
+        }
+        #warningMessage {
+            color: rgb(208, 36, 36);
+            font-weight: bold;
+            display: none;
+        }
+        #warningMessage textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 5px;
+            border-radius: 5px;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="block" >
+        <div class="raw">
+            <h1>Issue Tracker</h1>
+            <div>
+                <p> 
+                    <b>Issue State: </b>   
+                    <span id="issueState">Open</span> 
+                </p>
+                <p>
+                    <b>Last Comment By: </b>
+                    <span id="lastCommentAuthor">Anna Smith</span> 
+                </p>
+                <p>
+                    <b>Last Comment Time: </b>
+                    <span id="lastCommentTime">2024-11-26 12:00</span>
+                </p>
+            </div>
+
+            <div id="warningMessage">
+                <p> Please provide a reason for this decision.</p>
+                <textarea id="explanation" placeholder="Explanation"></textarea>
+                <button class='btn' id="submitExplanation" onclick="submitExplanation()">Submit</button>
+            </div>
+
+            <button class="btn" id="changeIssueState" onclick="changeIssueState()"> Won't fix</button>
+        </div>
+    </div>
+    <script>
+        const currentUser = {
+            id: '987',
+            name: 'Anna Smith'
+        };
+
+        //  issue data
+        let issueState = 'Open';  // Current issue state
+        let lastComment = {
+            author: 'Joe Doe',
+            timestamp: '2024-11-26T11:50:00'  
+        };
+
+        // Function to change the issue state
+        function changeIssueState() {
+            issueState = 'Won\'t fix';
+            document.getElementById('issueState').textContent = issueState;
+
+            checkForExplanationPrompt();
+        }
+
+        // Function to check if an explanation is needed
+        function checkForExplanationPrompt() {
+            const currentTime = new Date();
+            const lastCommentTime = new Date(lastComment.timestamp);
+            const timeDifference = (currentTime - lastCommentTime) / 1000 / 60;  
+
+            if (issueState === 'Won\'t fix' && 
+                lastComment.author !== currentUser.name && 
+                timeDifference > 5) {
+                document.getElementById('warningMessage').style.display = 'block';
+                document.getElementById('changeIssueState').style.display = 'none';
+            }
+        }
+
+        // Function to submit the explanation
+        function submitExplanation() {
+            const explanation = document.getElementById('explanation').value;
+            if (explanation.trim() === '') {
+                alert('Please provide an explanation before submitting.');
+                return;
+            }
+            alert('Explanation submitted successfully!');
+            document.getElementById('warningMessage').style.display = 'none';
+            console.log(new Date().toISOString());
+            lastComment = { author: currentUser.name, timestamp: new Date().toISOString() };  // Update the last comment
+            document.getElementById('lastCommentAuthor').innerHTML = currentUser.name;
+            document.getElementById('lastCommentTime').innerHTML = new Date().toISOString();
+
+            document.getElementById('changeIssueState').style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<html lang="en">
+<head>
+    <title>Assign Issue to Me </title>
+    <style>
+        .action-menu {
+            margin: 20px;
+        }
+        .btn {
+            cursor: pointer;
+            border: 1px solid transparent;
+            padding: 12px 20px;
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+            border-radius: 4px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="action-menu">
+        <button class="btn" id="assignToMeBtn" status="-1">Assign to Me</button>
+    </div>
+
+    <div class="issue-details">
+        <p>Current Assignee: <span id="assigneeName">Unassigned</span></p>
+    </div>
+
+    <script>
+        const currentUser = {
+            id: '987',
+            name: 'Anna Smith'
+        };
+
+        function updateAssignee(newAssignee) {
+            const assigneeElement = document.getElementById('assigneeName');
+            assigneeElement.textContent = newAssignee ? newAssignee : 'Unassigned';
+        }
+
+        document.getElementById('assignToMeBtn').addEventListener('click', function() {
+           let status = this.getAttribute('status') == '-1' ? -1 : 1;
+           if(status == -1) { 
+            this.innerHTML = "Unasssign me"
+            updateAssignee(currentUser.name);
+            // assignIssueToUser(currentUser.id, true)
+           }else{
+             this.innerHTML = "Assign to Me"
+             updateAssignee(null);
+               // assignIssueToUser(currentUser.id, false)
+           }
+           this.setAttribute('status', -status)
+        });
+
+
+        // Example of fetch request to the server 
+        
+        async function assignIssueToUser(userId, isAssigned) { // isAssigned is true when user wants to assign himself
+            try { 
+                const response = await fetch(
+                    '/api/issue/assign', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId, isAssigned })
+                });
+                const result = response.json(); 
+                if(result.success) {
+                    let updateAsigneeAttr = isAssigned ? currentUser.name : null;
+                    updateAssignee(updateAsigneeAttr);
+                }
+            }catch(e){
+                throw new Error(e.message);
+            }
+         
+        }
+
+    </script>
+</body>
+</html>
